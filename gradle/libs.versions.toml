@@ -14,6 +14,7 @@ hilt = "2.51.1"
 ksp = "2.1.0-1.0.29"
 room = "2.6.1"
 retrofit = "2.11.0"
+okhttp = "4.12.0"
 retrofit2KotlinxSerializationConverter = "1.0.0"
 kotlinxSerialization = "1.7.3"
 navigationCompose = "2.8.5"
@@ -40,6 +41,7 @@ androidx-navigation-compose = { group = "androidx.navigation", name = "navigatio
 # Hilt & KSP
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+androidx-hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version = "1.2.0" }
 
 # Room Database
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
@@ -48,6 +50,7 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # Networking & Serialization
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
 retrofit2-kotlinx-serialization-converter = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofit2KotlinxSerializationConverter" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 
