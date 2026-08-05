@@ -30,10 +30,6 @@ class AddTransactionViewModel @Inject constructor(
         _uiState.update { it.copy(amount = newAmount, errorMessage = null) }
     }
 
-    fun onCurrencySelected(currency: String) {
-        _uiState.update { it.copy(selectedCurrency = currency) }
-    }
-
     fun onCategorySelected(category: TransactionCategory) {
         _uiState.update { it.copy(selectedCategory = category) }
     }
@@ -44,6 +40,10 @@ class AddTransactionViewModel @Inject constructor(
 
     fun onNoteChanged(newNote: String) {
         _uiState.update { it.copy(note = newNote) }
+    }
+
+    fun resetState() {
+        _uiState.value = AddTransactionUiState()
     }
 
     fun saveTransaction() {
@@ -66,8 +66,6 @@ class AddTransactionViewModel @Inject constructor(
             val newTransaction = Transaction(
                 title = currentState.title.trim(),
                 amount = amountValue,
-                currency = currentState.selectedCurrency,
-                convertedAmountEUR = 0.0,
                 category = currentState.selectedCategory,
                 type = currentState.selectedType,
                 timestamp = System.currentTimeMillis(),

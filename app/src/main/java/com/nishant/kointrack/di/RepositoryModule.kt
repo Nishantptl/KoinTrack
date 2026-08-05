@@ -1,8 +1,6 @@
 package com.nishant.kointrack.di
 
-import com.nishant.kointrack.data.repository.ExchangeRateRepositoryImpl
 import com.nishant.kointrack.data.repository.TransactionRepositoryImpl
-import com.nishant.kointrack.domain.repository.ExchangeRateRepository
 import com.nishant.kointrack.domain.repository.TransactionRepository
 import dagger.Binds
 import dagger.Module
@@ -19,10 +17,4 @@ abstract class RepositoryModule {
     abstract fun bindTransactionRepository(
         impl: TransactionRepositoryImpl
     ): TransactionRepository
-
-    @Binds
-    @Singleton
-    abstract fun bindExchangeRateRepository(
-        impl: ExchangeRateRepositoryImpl
-    ): ExchangeRateRepository
 }

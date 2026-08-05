@@ -5,8 +5,8 @@ import com.nishant.kointrack.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.time.Instant
-import java.time.ZoneId
 import java.time.YearMonth
+import java.time.ZoneId
 import javax.inject.Inject
 
 class GetMonthlyExpensesUseCase @Inject constructor(
@@ -20,7 +20,7 @@ class GetMonthlyExpensesUseCase @Inject constructor(
                     transaction.type == TransactionType.EXPENSE &&
                             getYearMonth(transaction.timestamp) == targetYearMonth
                 }
-                .sumOf { it.convertedAmountEUR }
+                .sumOf { it.amount }
         }
     }
 

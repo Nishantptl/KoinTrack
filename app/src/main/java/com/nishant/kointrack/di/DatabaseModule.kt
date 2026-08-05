@@ -2,7 +2,6 @@ package com.nishant.kointrack.di
 
 import android.content.Context
 import androidx.room.Room
-import com.nishant.kointrack.data.local.ExchangeRateDao
 import com.nishant.kointrack.data.local.KoinTrackDatabase
 import com.nishant.kointrack.data.local.TransactionDao
 import dagger.Module
@@ -32,11 +31,5 @@ object DatabaseModule {
     @Singleton
     fun provideTransactionDao(database: KoinTrackDatabase): TransactionDao {
         return database.transactionDao()
-    }
-
-    @Provides
-    @Singleton
-    fun provideExchangeRateDao(database: KoinTrackDatabase): ExchangeRateDao {
-        return database.exchangeRateDao()
     }
 }

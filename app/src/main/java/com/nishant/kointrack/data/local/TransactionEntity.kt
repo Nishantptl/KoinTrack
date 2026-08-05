@@ -8,8 +8,6 @@ data class TransactionEntity(
     @PrimaryKey val id: String,
     val title: String,
     val amount: Double,
-    val currency: String,
-    val convertedAmountEUR: Double,
     val category: String,
     val type: String,
     val timestamp: Long,

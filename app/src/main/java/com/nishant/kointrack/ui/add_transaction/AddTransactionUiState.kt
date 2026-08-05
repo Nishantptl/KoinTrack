@@ -6,7 +6,6 @@ import com.nishant.kointrack.domain.model.TransactionType
 data class AddTransactionUiState(
     val title: String = "",
     val amount: String = "",
-    val selectedCurrency: String = "EUR",
     val selectedCategory: TransactionCategory = TransactionCategory.FOOD,
     val selectedType: TransactionType = TransactionType.EXPENSE,
     val note: String = "",

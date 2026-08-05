@@ -1,6 +1,7 @@
 package com.nishant.kointrack.ui.navigation
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object AddTransaction : Screen("add_transaction")
+    object Dashboard : Screen("dashboard")
+    object AddExpense : Screen("add_expense")
+    object History : Screen("history")
 }

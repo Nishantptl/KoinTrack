@@ -1,9 +1,8 @@
 package com.nishant.kointrack.ui.add_transaction
 
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,25 +10,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -37,9 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -47,31 +35,25 @@ import androidx.compose.ui.unit.dp
 import com.nishant.kointrack.domain.model.TransactionCategory
 import com.nishant.kointrack.domain.model.TransactionType
 
-val supportedCurrencies = listOf("EUR", "USD", "INR", "GBP", "JPY", "CAD", "AUD")
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel,
-    onNavigateBack: () -> Unit
+    onTransactionAdded: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
     LaunchedEffect(uiState.isSuccess) {
         if (uiState.isSuccess) {
-            onNavigateBack()
+            viewModel.resetState()
+            onTransactionAdded()
         }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Add Transaction", fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                },
+                title = { Text("Add Transaction (€)", fontWeight = FontWeight.Bold) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -83,97 +65,69 @@ fun AddTransactionScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Type Selector (Expense / Income)
-            SingleChoiceSegmentedButtonRow(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                TransactionType.entries.forEachIndexed { index, type ->
-                    SegmentedButton(
-                        selected = uiState.selectedType == type,
-                        onClick = { viewModel.onTypeSelected(type) },
-                        shape = SegmentedButtonDefaults.itemShape(index = index, count = TransactionType.entries.size)
-                    ) {
-                        Text(type.name)
-                    }
-                }
+            // Type Selector Chips (Expense vs Income)
+            Text(
+                text = "Transaction Type",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                FilterChip(
+                    selected = uiState.selectedType == TransactionType.EXPENSE,
+                    onClick = { viewModel.onTypeSelected(TransactionType.EXPENSE) },
+                    label = { Text("Expense") }
+                )
+                FilterChip(
+                    selected = uiState.selectedType == TransactionType.INCOME,
+                    onClick = { viewModel.onTypeSelected(TransactionType.INCOME) },
+                    label = { Text("Income") }
+                )
             }
 
             // Title Field
             OutlinedTextField(
                 value = uiState.title,
                 onValueChange = { viewModel.onTitleChanged(it) },
-                label = { Text("Title") },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
+                label = { Text("Title *") },
+                placeholder = { Text("e.g., Grocery Shopping") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
             )
 
-            // Amount & Currency Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                OutlinedTextField(
-                    value = uiState.amount,
-                    onValueChange = { viewModel.onAmountChanged(it) },
-                    label = { Text("Amount") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.weight(1f),
-                    singleLine = true
-                )
+            // Amount Field (EUR)
+            OutlinedTextField(
+                value = uiState.amount,
+                onValueChange = { viewModel.onAmountChanged(it) },
+                label = { Text("Amount in EUR (€) *") },
+                placeholder = { Text("e.g., 24.50") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
+            )
 
-                // Currency Dropdown
-                var currencyExpanded by remember { mutableStateOf(false) }
-                ExposedDropdownMenuBox(
-                    expanded = currencyExpanded,
-                    onExpandedChange = { currencyExpanded = !currencyExpanded },
-                    modifier = Modifier.weight(0.7f)
-                ) {
-                    OutlinedTextField(
-                        value = uiState.selectedCurrency,
-                        onValueChange = {},
-                        readOnly = true,
-                        label = { Text("Currency") },
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = currencyExpanded) },
-                        modifier = Modifier.menuAnchor()
-                    )
-                    ExposedDropdownMenu(
-                        expanded = currencyExpanded,
-                        onDismissRequest = { currencyExpanded = false }
-                    ) {
-                        supportedCurrencies.forEach { currency ->
-                            DropdownMenuItem(
-                                text = { Text(currency) },
-                                onClick = {
-                                    viewModel.onCurrencySelected(currency)
-                                    currencyExpanded = false
-                                }
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Category Picker
+            // Category Chips
             Text(
                 text = "Category",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
             )
-
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                TransactionCategory.entries.forEach { category ->
+                TransactionCategory.values().forEach { cat ->
                     FilterChip(
-                        selected = uiState.selectedCategory == category,
-                        onClick = { viewModel.onCategorySelected(category) },
-                        label = { Text(category.name) }
+                        selected = uiState.selectedCategory == cat,
+                        onClick = { viewModel.onCategorySelected(cat) },
+                        label = { Text(cat.name) }
                     )
                 }
             }
@@ -183,36 +137,31 @@ fun AddTransactionScreen(
                 value = uiState.note,
                 onValueChange = { viewModel.onNoteChanged(it) },
                 label = { Text("Note (Optional)") },
-                modifier = Modifier.fillMaxWidth(),
-                maxLines = 3
+                placeholder = { Text("Add any extra details...") },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
             )
 
-            // Error Message
-            uiState.errorMessage?.let { error ->
+            if (uiState.errorMessage != null) {
                 Text(
-                    text = error,
+                    text = uiState.errorMessage!!,
                     color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.bodySmall
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-            // Save Button
             Button(
                 onClick = { viewModel.saveTransaction() },
                 enabled = !uiState.isLoading,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp)
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier.fillMaxWidth()
             ) {
                 if (uiState.isLoading) {
-                    CircularProgressIndicator(
-                        color = MaterialTheme.colorScheme.onPrimary,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary)
                 } else {
-                    Text("Save Transaction", style = MaterialTheme.typography.titleMedium)
+                    Text("Save Transaction", fontWeight = FontWeight.Bold)
                 }
             }
         }
